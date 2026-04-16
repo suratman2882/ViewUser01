@@ -2,20 +2,15 @@ package com.example.viewuser01.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-
+import androidx.compose.runtime.collectAsState
 import com.example.viewuser01.ui.screens.UserDetailScreen
 import com.example.viewuser01.ui.screens.UserListScreen
 import com.example.viewuser01.viewmodel.UserViewModel
-
-
-class WikiNavigation {
-}
 
 @Composable
 fun Navigation(
@@ -29,10 +24,16 @@ fun Navigation(
 
         // 🔹 Screen: List User
         composable("user_list") {
+
+            val uiState = viewModel.uiState.collectAsState().value
+
             UserListScreen(
-                users = viewModel.getUsers(),
+                uiState = uiState,
                 onUserClicked = { userId ->
                     navController.navigate("user_detail/$userId")
+                },
+                onRetryClick = {
+                    viewModel.fetchUsers()
                 }
             )
         }

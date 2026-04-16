@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -60,4 +61,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.kotlinx.coroutines.android)
 }

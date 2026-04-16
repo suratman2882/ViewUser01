@@ -1,22 +1,43 @@
 package com.example.viewuser01.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.viewuser01.model.User
+import com.example.viewuser01.network.ApiClient
+import com.example.viewuser01.ui.state.UserUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlin.collections.find
 
 class UserViewModel : ViewModel() {
 
-    // Simulasi data database
-    private val users = listOf(
-        User(1, "Naruto", "Ninja dari Konaha"),
-        User(2, "Sasuke", "Pencari Keadilan"),
-        User(3, "Sakura", "Medis Ninja Hebat")
-    )
+    private val _uiState = MutableStateFlow<UserUiState>(UserUiState.Loading)
+    val uiState: StateFlow<UserUiState> = _uiState
 
-    // Fungsi untuk mendapatkan daftar user
-    fun getUsers(): List<User> = users
+    init {
+        fetchUsers()
+    }
 
-    // Fungsi untuk mencari satu user berdasarkan ID
+    // 🔥 harus public supaya bisa dipanggil dari UI
+    fun fetchUsers() {
+        viewModelScope.launch {
+            try {
+                val users = ApiClient.api.getUsers() // ✔ FIX typo
+                _uiState.value = UserUiState.Success(users)
+            } catch (e: Exception) {
+                _uiState.value = UserUiState.Error("Gagal mengambil data: ${e.message}")
+            }
+        }
+    }
+
+    // 🔥 ambil user berdasarkan ID
     fun getUserById(id: Int): User? {
-        return users.find { it.id == id }
+        val currentState = _uiState.value
+        return if (currentState is UserUiState.Success) {
+            currentState.users.find { it.id == id }
+        } else {
+            null
+        }
     }
 }
