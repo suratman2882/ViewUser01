@@ -23,29 +23,34 @@ import androidx.compose.ui.unit.dp
 import com.example.viewuser01.model.User
 import com.example.viewuser01.ui.state.UserUiState
 import androidx.compose.foundation.layout.height
+import com.example.viewuser01.ui.components.UserItem
 
 @Composable
 fun UserListScreen(
     uiState: UserUiState,
     onUserClicked: (Int) -> Unit,
     onRetryClick: () -> Unit
-){
-    when (uiState){
-        is UserUiState.Loading ->{
+) {
+    when (uiState) {
+
+        // 🔹 LOADING
+        is UserUiState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 CircularProgressIndicator()
             }
         }
 
-        is UserUiState.Success ->{
+        // 🔹 SUCCESS
+        is UserUiState.Success -> {
             LazyColumn(
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(uiState.users){ user ->
+                items(uiState.users) { user ->
                     UserItem(
                         user = user,
                         onClick = { onUserClicked(user.id) }
@@ -54,36 +59,38 @@ fun UserListScreen(
             }
         }
 
-        is UserUiState.Error ->{
+        // 🔹 ERROR
+        is UserUiState.Error -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
-            ){
-                Column(horizontalAlignment = Alignment.CenterHorizontally){
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         text = uiState.message,
                         color = MaterialTheme.colorScheme.error
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = onRetryClick){
+                    Button(onClick = onRetryClick) {
                         Text("Coba Lagi")
                     }
                 }
             }
         }
-    }
-}
 
-@Composable
-fun UserItem(user: User, onClick: () -> Unit){
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-    ){
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = user.name, style = MaterialTheme.typography.titleMedium)
-            Text(text = user.email, style = MaterialTheme.typography.bodySmall)
+        // 🔹 EMPTY (🔥 FIX ERROR DI SINI)
+        is UserUiState.Empty -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Data user tidak tersedia",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
         }
     }
 }

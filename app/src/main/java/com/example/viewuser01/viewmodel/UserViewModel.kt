@@ -15,15 +15,18 @@ class UserViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<UserUiState>(UserUiState.Loading)
     val uiState: StateFlow<UserUiState> = _uiState
 
+    // 🔥 TAMBAHAN: selected user
+    private val _selectedUser = MutableStateFlow<User?>(null)
+    val selectedUser: StateFlow<User?> = _selectedUser
+
     init {
         fetchUsers()
     }
 
-    // 🔥 harus public supaya bisa dipanggil dari UI
     fun fetchUsers() {
         viewModelScope.launch {
             try {
-                val users = ApiClient.api.getUsers() // ✔ FIX typo
+                val users = ApiClient.api.getUsers()
                 _uiState.value = UserUiState.Success(users)
             } catch (e: Exception) {
                 _uiState.value = UserUiState.Error("Gagal mengambil data: ${e.message}")
@@ -31,13 +34,11 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    // 🔥 ambil user berdasarkan ID
-    fun getUserById(id: Int): User? {
+    // 🔥 FIX: pilih user, bukan ambil langsung di detail
+    fun selectUser(id: Int) {
         val currentState = _uiState.value
-        return if (currentState is UserUiState.Success) {
-            currentState.users.find { it.id == id }
-        } else {
-            null
+        if (currentState is UserUiState.Success) {
+            _selectedUser.value = currentState.users.find { it.id == id }
         }
     }
 }
